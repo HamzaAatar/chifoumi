@@ -112,14 +112,17 @@ def main():
      """)
 
     choix = str(input("Do You Want To Start (Y/n/r)?"))
+    choix = choix.replace(' ', '')
     while choix not in ['n', 'N', 'no', 'NO', 'No']:
         if choix == 'r':
             Chifoumi.save_score()
             Chifoumi.rankOfPlayers()
             print("\n*************\n")
             choix = str(input("""Y: Play again.\nn: Exit.\nr: Ranking."""))
+            choix = choix.replace(' ', '')
         else:
             p_name = str(input("You're name is: "))
+            p_name = p_name.replace(' ', '')
             rounds = int(input("How many rounds do you wanna play? "))
 
             assert (int(rounds) - rounds) == 0, 'The number of rounds is an integer!!'
@@ -132,6 +135,7 @@ def main():
                 player.score, player.duree))
             print("*****************************************************************************\n")
             choix = str(input("""Y: Play again.\nn: Exit.\nr: Ranking."""))
+            choix = choix.replace(' ', '')
 
     print("\n**For More Information About The Players Check chifoumi_scores.txt**")
     print("\n*****************************************")
