@@ -9,13 +9,14 @@ class Chifoumi:
     scores = {}
     options = ['Rock', 'Paper', 'Scissors']
 
+    # prepare file to save sessions & scores
     f = open('chifoumi_scores.txt', 'a+')
 
     with open('chifoumi_scores.txt') as my_file:
-
         my_file.seek(0)
         first_char = my_file.read(1)
         if not first_char:
+            # the file is empty
             f.write('<Player> <Score> <Time in seconds>\n')
             f.write('Standard 0 0\n')
         else:
@@ -33,63 +34,75 @@ class Chifoumi:
             self.scores[self.name] = [0, 0]
 
     def start_game(self):
+        ''' start the game '''
 
         start = time()
-        c = 0
-        for i in range(self.n):
+        conteur = 0
+        i = 0
+        while i < self.n:
 
-            choice = int(input("\nRock: 0, Papre: 1, Scissors: 2 ==> "))
-            assert choice in [0, 1, 2], "Choose 0, 1, 2... Play Again!!"
-            player_1 = self.options[choice]
-            computer = self.options[randint(0, 2)]
+            while True:
+                try:
+                    choice = int(input("\nRock: 0, Papre: 1, Scissors: 2 ==> "))
+                    break
+                except ValueError:
+                    print("\nPlease Choose 0, 1 or 2... Play Again!!")
 
-            if player_1 == computer:
-                print('\n*** Tie!! ***')
-            elif player_1 == "Rock":
-                if computer == "Paper":
-                    print("\n*** You lose!", computer, "covers", player_1, "***")
+            if choice in [0, 1, 2]:
+                player_1 = self.options[choice]
+                computer = self.options[randint(0, 2)]
+
+                if player_1 == computer:
+                    print('\n*** Tie!! ***')
+                elif player_1 == "Rock":
+                    if computer == "Paper":
+                        print("\n*** You lose!", computer, "covers", player_1, "***")
+                    else:
+                        print("\n*** You win!", player_1, "smashes", computer, "***")
+                        conteur += 1
+                elif player_1 == "Paper":
+                    if computer == "Scissors":
+                        print("\n*** You lose!", computer, "cut", player_1, "***")
+
+                    else:
+                        print("\n*** You win!", player_1, "covers", computer, "***")
+                        conteur += 1
+                elif player_1 == "Scissors":
+                    if computer == "Rock":
+                        print("\n*** You lose...", computer, "smashes", player_1, "***")
+
+                    else:
+                        print("\n*** You win!", player_1, "cut", computer, "***")
+                        conteur += 1
                 else:
-                    print("\n*** You win!", player_1, "smashes", computer, "***")
-                    c += 1
-            elif player_1 == "Paper":
-                if computer == "Scissors":
-                    print("\n*** You lose!", computer, "cut", player_1, "***")
+                    print("\nThat's not a valid play. Check your spelling!  ")
+                i += 1
 
-                else:
-                    print("\n*** You win!", player_1, "covers", computer, "***")
-                    c += 1
-            elif player_1 == "Scissors":
-                if computer == "Rock":
-                    print("\n*** You lose...", computer, "smashes", player_1, "***")
-
-                else:
-                    print("\n*** You win!", player_1, "cut", computer, "***")
-                    c += 1
             else:
-                print("\nThat's not a valid play. Check your spelling!  ")
-
-            computer = self.options[randint(0, 2)]
+                print("\nPlease Choose 0, 1 or 2... Play Again!!")
 
         self.duree = float(time() - start)
-        self.score = c
-        if c > self.scores[self.name][0]:
-            self.scores[self.name][0] = c
-            self.scores[self.name][1] = self.duree
+        self.score = conteur
 
-    @staticmethod
-    def deletecontent(pfile):
-        pfile.seek(0)
-        pfile.truncate()
+        # to save the highest score
+        if conteur > self.scores[self.name][0]:
+            self.scores[self.name][0] = conteur
+            self.scores[self.name][1] = self.duree
 
     @classmethod
     def save_score(cls):
-        cls.deletecontent(cls.f)
+        ''' saving score to the file '''
+
+        cls.f.seek(0)
+        cls.f.truncate()
         cls.f.write('<Player> <Score> <Time in seconds>\n')
         for i in cls.scores.keys():
             cls.f.write("{} {} {}\n".format(i, cls.scores[i][0], cls.scores[i][1]))
 
     @classmethod
     def rankOfPlayers(cls):
+        ''' Ranking players by score '''
+
         listofTuples = sorted(cls.scores.items(),  key=lambda x: x[1], reverse=True)
         print("\n*************")
         print("\nRanking:\n")
@@ -113,6 +126,7 @@ def main():
 
     choix = str(input("Do You Want To Start (Y/n/r)?"))
     choix = choix.replace(' ', '')
+
     while choix not in ['n', 'N', 'no', 'NO', 'No']:
         if choix == 'r':
             Chifoumi.save_score()
@@ -123,9 +137,12 @@ def main():
         else:
             p_name = str(input("You're name is: "))
             p_name = p_name.replace(' ', '')
-            rounds = int(input("How many rounds do you wanna play? "))
-
-            assert (int(rounds) - rounds) == 0, 'The number of rounds is an integer!!'
+            while True:
+                try:
+                    rounds = int(input("How many rounds do you wanna play? "))
+                    break
+                except ValueError:
+                    print('The number of rounds is an integer !!')
 
             player = Chifoumi(p_name, rounds)
             player.start_game()
